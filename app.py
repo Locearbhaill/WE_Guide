@@ -200,7 +200,7 @@ ECONOMY_BLOCKS: list[InfoBlock] = [
             "Basic raw resources such as iron are processed into advanced resources such as steel.",
             "Market prices are entirely player-driven through supply and demand.",
         ],
-        tip="Use bot commands, such as /help with #rob jetten, and check warerastats.io to find profitable resources.",
+        tip="Check warerastats.io to find profitable resources.",
     ),
     InfoBlock(
         title="Practical Rules",
