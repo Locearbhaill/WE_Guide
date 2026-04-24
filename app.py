@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from dataclasses import dataclass, field
 from html import escape
 from pathlib import Path
@@ -13,6 +14,8 @@ APP_SUBTITLE = (
     "economy and war."
 )
 ASSETS_DIR = Path(__file__).parent / "assets" / "screenshots"
+RESOURCE_ICONS_DIR = Path(__file__).parent / "assets" / "resource_icons"
+EQUIPMENT_ICONS_DIR = Path(__file__).parent / "assets" / "equipment"
 
 
 @dataclass(frozen=True)
@@ -38,6 +41,45 @@ class InfoBlock:
     tags: list[str] | None = None
     steps: list[str] | None = None
     warning: str | None = None
+
+
+@dataclass(frozen=True)
+class ResourceInfo:
+    name: str
+    category: str
+    description: str
+    production_cost: str
+    icon_file: str | None = None
+
+
+@dataclass(frozen=True)
+class EquipmentTypeInfo:
+    name: str
+    effect: str
+    icon_file: str
+
+
+@dataclass(frozen=True)
+class EquipmentTierInfo:
+    tier: str
+    theme: str
+    helmet: str
+    chest: str
+    gloves: str
+    pants: str
+    boots: str
+    weapon_name: str
+    weapon_damage: str
+    weapon_crit: str
+    weapon_icon_file: str
+
+
+@dataclass(frozen=True)
+class AmmoInfo:
+    name: str
+    bonus: str
+    description: str
+    icon_file: str
 
 
 @dataclass(frozen=True)
@@ -186,6 +228,13 @@ BASICS_BLOCKS: list[InfoBlock] = [
 
 ECONOMY_BLOCKS: list[InfoBlock] = [
     InfoBlock(
+        title="Companies",
+        paragraphs=[
+            "Every player can own companies.",
+            "A company can produce different resources that you can either use yourself or sell on the market.",
+        ],
+    ),
+    InfoBlock(
         title="Making Money",
         paragraphs=[
             "Working for other players uses energy and pays wages per production point, minus taxes.",
@@ -199,6 +248,7 @@ ECONOMY_BLOCKS: list[InfoBlock] = [
         paragraphs=[
             "Basic raw resources such as iron are processed into advanced resources such as steel.",
             "Market prices are entirely player-driven through supply and demand.",
+            "Manufactured goods also consume an equal amount of base material to their Production Point cost, so efficient input planning matters.",
         ],
         tip="Check warerastats.io to find profitable resources.",
     ),
@@ -209,6 +259,101 @@ ECONOMY_BLOCKS: list[InfoBlock] = [
             "Also avoid using the equipment from those cases too early.",
             "Check production bonuses and upgrades that increase output to maximize long-term profit.",
         ],
+    ),
+]
+
+
+ECONOMY_RESOURCES: list[ResourceInfo] = [
+    ResourceInfo(
+        name="Iron",
+        category="Base Material",
+        description="Used to produce Steel.",
+        production_cost="1 Production Point (PP)",
+        icon_file="iron.png",
+    ),
+    ResourceInfo(
+        name="Steel",
+        category="Manufactured Material",
+        description="Used to craft equipment and to upgrade companies, Military Units, and provincial buildings.",
+        production_cost="10 Production Points (PP) + 10 Iron",
+        icon_file="steel.png",
+    ),
+    ResourceInfo(
+        name="Limestone",
+        category="Base Material",
+        description="Used to produce Concrete.",
+        production_cost="1 Production Point (PP)",
+        icon_file="limestone.png",
+    ),
+    ResourceInfo(
+        name="Concrete",
+        category="Manufactured Material",
+        description="Used for building new companies and Military Units.",
+        production_cost="10 Production Points (PP) + 10 Limestone",
+        icon_file="concrete.png",
+    ),
+    ResourceInfo(
+        name="Lead",
+        category="Base Material",
+        description="Used in the production of Ammunition.",
+        production_cost="1 Production Point (PP)",
+        icon_file="lead.png",
+    ),
+    ResourceInfo(
+        name="Grain",
+        category="Base Material",
+        description="Used in the production of Bread.",
+        production_cost="1 Production Point (PP)",
+        icon_file="grain.png",
+    ),
+    ResourceInfo(
+        name="Bread",
+        category="Food Item",
+        description="Regenerates 10% of your maximum health.",
+        production_cost="10 Production Points (PP) + 10 Grain",
+        icon_file="bread.png",
+    ),
+    ResourceInfo(
+        name="Livestock",
+        category="Base Material",
+        description="Used in the production of Steak.",
+        production_cost="20 Production Points (PP)",
+        icon_file="livestock.png",
+    ),
+    ResourceInfo(
+        name="Steak",
+        category="Food Item",
+        description="Regenerates 15% of your maximum health.",
+        production_cost="20 Production Points (PP) + 20 Livestock",
+        icon_file="steak.png",
+    ),
+    ResourceInfo(
+        name="Fish",
+        category="Base Material",
+        description="Used in the production of Cooked Fish.",
+        production_cost="40 Production Points (PP)",
+        icon_file="fish.png",
+    ),
+    ResourceInfo(
+        name="Cooked Fish",
+        category="Food Item",
+        description="Regenerates 20% of your maximum health.",
+        production_cost="40 Production Points (PP) + 40 Fish",
+        icon_file="cookedFish.png",
+    ),
+    ResourceInfo(
+        name="Mysterious Plant",
+        category="Base Material",
+        description="Used in the production of Pills.",
+        production_cost="1 Production Point (PP)",
+        icon_file="coca.png",
+    ),
+    ResourceInfo(
+        name="Pill",
+        category="Manufactured Material",
+        description="Gives a 60% damage bonus for 8 hours, followed by a -60% damage cooldown for 16 hours.",
+        production_cost="200 Production Points (PP) + 200 Mysterious Plant",
+        icon_file="pill.png",
     ),
 ]
 
@@ -270,6 +415,33 @@ FIGHT_BLOCKS: list[InfoBlock] = [
         ],
         tip="The order of bonuses matters. A Pill gives a strong short-term boost, but it also causes a long 16-hour debuff afterward.",
     ),
+]
+
+
+EQUIPMENT_TYPES: list[EquipmentTypeInfo] = [
+    EquipmentTypeInfo("Helmet", "Critical hit chance", "helmet.png"),
+    EquipmentTypeInfo("Chest Armour", "Protects health when attacking by providing armour", "chest.png"),
+    EquipmentTypeInfo("Trousers", "Protects health when attacking by providing armour", "pants.png"),
+    EquipmentTypeInfo("Gloves", "Hit chance", "gloves.png"),
+    EquipmentTypeInfo("Boots", "Dodge chance", "boots.png"),
+    EquipmentTypeInfo("Weapon", "Damage and critical hit chance", "gun.png"),
+]
+
+
+EQUIPMENT_TIERS: list[EquipmentTierInfo] = [
+    EquipmentTierInfo("Red", "#ef4444", "121–150%", "56–70", "51–60%", "56–70", "51–60%", "Fighter Jet", "221–300", "41–50%", "jet.png"),
+    EquipmentTierInfo("Gold", "#d4a843", "91–110%", "36–50", "31–40%", "36–50", "31–40%", "Tank", "141–170", "26–35%", "tank.png"),
+    EquipmentTierInfo("Purple", "#a855f7", "71–90%", "21–30", "21–25%", "21–30", "21–25%", "Sniper", "101–130", "16–20%", "sniper.png"),
+    EquipmentTierInfo("Blue", "#3b82f6", "31–50%", "11–15", "11–15%", "11–15", "11–15%", "Rifle", "71–90", "11–15%", "rifle.png"),
+    EquipmentTierInfo("Green", "#22c55e", "16–30%", "6–10", "6–10%", "6–10", "6–10%", "Gun", "51–60", "6–10%", "gun.png"),
+    EquipmentTierInfo("Grey", "#9ca3af", "1–15%", "1–5", "1–5%", "1–5", "1–5%", "Knife", "21–40", "1–5%", "knife.png"),
+]
+
+
+AMMO_TYPES: list[AmmoInfo] = [
+    AmmoInfo("Light Ammunition", "+10% damage", "Provides a 10% bonus to weapon damage while equipped.", "lightAmmo.png"),
+    AmmoInfo("Medium Ammunition", "+20% damage", "Provides a 20% bonus to weapon damage while equipped.", "ammo.png"),
+    AmmoInfo("Heavy Ammunition", "+40% damage", "Provides a 40% bonus to weapon damage while equipped.", "heavyAmmo.png"),
 ]
 
 
@@ -609,6 +781,57 @@ st.markdown(
             border-color: #1f9d74;
         }
 
+        .armour-calc-marker {
+            display: none;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) {
+            background: #1c2333 !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 10px;
+            padding: 1rem 1.1rem;
+            margin-bottom: 1rem;
+            transition: background 0.2s ease, border-color 0.2s ease;
+            box-shadow: none !important;
+            overflow: hidden;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) > div,
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) > div > div,
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) [data-testid="stVerticalBlock"] {
+            background: transparent !important;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker):hover {
+            background: #222d3f !important;
+            border-color: #1f9d74 !important;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker):hover > div,
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker):hover > div > div,
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker):hover [data-testid="stVerticalBlock"] {
+            background: transparent !important;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) h3 {
+            color: var(--accent-gold);
+            font-size: 1.35rem;
+            margin-bottom: 0.7rem;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) p,
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) label,
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) [data-testid="stCaptionContainer"] {
+            color: var(--text-secondary);
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.armour-calc-marker) [data-testid="stMetric"] {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.85rem 0.95rem;
+        }
+
         .check-card {
             border-left: 4px solid var(--accent-gold);
         }
@@ -665,6 +888,313 @@ st.markdown(
 
         .info-card p:last-child {
             margin-bottom: 0;
+        }
+
+        .resource-section-intro {
+            color: var(--text-secondary);
+            margin: 0.15rem 0 1rem;
+        }
+
+        .resource-card {
+            min-height: 178px;
+        }
+
+        .resource-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.55rem;
+        }
+
+        .resource-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .resource-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .resource-header-copy {
+            min-width: 0;
+        }
+
+        .resource-card h4 {
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.3rem;
+            margin: 0 0 0.2rem;
+        }
+
+        .resource-pill {
+            display: inline-block;
+            margin-bottom: 0.75rem;
+            padding: 0.22rem 0.58rem;
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.28);
+            border-radius: 999px;
+            color: var(--accent-teal);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.02rem;
+        }
+
+        .resource-copy {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.55;
+            margin-bottom: 0.8rem;
+        }
+
+        .resource-cost {
+            padding: 0.7rem 0.8rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .resource-cost-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .jump-link-row {
+            margin: -0.2rem 0 1rem;
+        }
+
+        .jump-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--accent-teal);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.92rem;
+            border-bottom: 1px solid rgba(16,185,129,0.28);
+            padding-bottom: 0.1rem;
+        }
+
+        .jump-link:hover {
+            border-color: rgba(16,185,129,0.8);
+        }
+
+        .equipment-intro {
+            color: var(--text-secondary);
+            margin: 0.15rem 0 1rem;
+        }
+
+        .equipment-card {
+            min-height: 160px;
+        }
+
+        .equipment-card-header,
+        .ammo-card-header,
+        .tier-weapon-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .equipment-icon-wrap,
+        .ammo-icon-wrap,
+        .tier-weapon-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .equipment-icon,
+        .ammo-icon,
+        .tier-weapon-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
+
+        .equipment-card h4,
+        .ammo-card h4,
+        .tier-card h4 {
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .equipment-copy,
+        .ammo-copy,
+        .tier-copy {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.55;
+        }
+
+        .equipment-effect {
+            padding: 0.7rem 0.8rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+        }
+
+        .equipment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.85rem;
+        }
+
+        .equipment-table th {
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04rem;
+            padding: 0 0.45rem 0.45rem;
+        }
+
+        .equipment-table td {
+            padding: 0.55rem 0.45rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            vertical-align: top;
+        }
+
+        .equipment-tier-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 56px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.14);
+            font-size: 0.76rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .equipment-stat-highlight {
+            font-weight: 700;
+        }
+
+        .weapon-tier-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .weapon-tier-icon-wrap {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .weapon-tier-icon {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .equipment-effect-label,
+        .tier-stat-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .tier-card {
+            min-height: 100%;
+        }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.55rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .tier-stat {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.65rem 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .tier-weapon-box {
+            margin-top: 0.25rem;
+            padding: 0.8rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .tier-weapon-copy {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .ammo-bonus {
+            display: inline-block;
+            margin-bottom: 0.75rem;
+            padding: 0.22rem 0.58rem;
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.28);
+            border-radius: 999px;
+            color: var(--accent-teal);
+            font-size: 0.78rem;
+            font-weight: 700;
         }
 
         .bars-grid {
@@ -839,6 +1369,10 @@ st.markdown(
             .bars-grid {
                 grid-template-columns: 1fr;
             }
+
+            .tier-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
     """,
@@ -933,6 +1467,11 @@ def render_info_block(block: InfoBlock) -> None:
         )
         parts.append(steps_html)
 
+    if block.title == "Weapons, Equipment, and Ammo":
+        parts.append(
+            '<div class="jump-link-row"><a class="jump-link" href="#equipment-reference">Jump to equipment reference ↓</a></div>'
+        )
+
     if block.tip:
         parts.append(f'<div class="tip-box">{escape(block.tip)}</div>')
 
@@ -941,6 +1480,199 @@ def render_info_block(block: InfoBlock) -> None:
 
     parts.append('</div>')
     st.markdown("".join(parts), unsafe_allow_html=True)
+
+
+def resource_icon_data_uri(resource: ResourceInfo) -> str | None:
+    if not resource.icon_file:
+        return None
+
+    icon_path = RESOURCE_ICONS_DIR / resource.icon_file
+    if not icon_path.exists():
+        return None
+
+    extension = icon_path.suffix.lower().lstrip(".") or "png"
+    encoded = base64.b64encode(icon_path.read_bytes()).decode("ascii")
+    return f"data:image/{extension};base64,{encoded}"
+
+
+def icon_file_data_uri(directory: Path, file_name: str | None) -> str | None:
+    if not file_name:
+        return None
+
+    icon_path = directory / file_name
+    if not icon_path.exists():
+        return None
+
+    extension = icon_path.suffix.lower().lstrip(".") or "png"
+    encoded = base64.b64encode(icon_path.read_bytes()).decode("ascii")
+    return f"data:image/{extension};base64,{encoded}"
+
+
+def render_economy_resources() -> None:
+    st.markdown('<h3 class="info-card-title">Resources</h3>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="resource-section-intro">There is a wide variety of resources in the game, each with its own use. The cards below give a quick overview of what each resource does and what it costs to produce. Manufactured goods also require matching base materials in addition to their Production Point cost.</p>',
+        unsafe_allow_html=True,
+    )
+
+    for start in range(0, len(ECONOMY_RESOURCES), 2):
+        row = ECONOMY_RESOURCES[start : start + 2]
+        columns = st.columns(len(row))
+        for column, resource in zip(columns, row):
+            with column:
+                icon_data_uri = resource_icon_data_uri(resource)
+                icon_html = (
+                    f'<div class="resource-icon-wrap"><img class="resource-icon" src="{icon_data_uri}" alt="{escape(resource.name)} icon"></div>'
+                    if icon_data_uri
+                    else '<div class="resource-icon-wrap"></div>'
+                )
+                st.markdown(
+                    f"""
+                    <div class="card resource-card">
+                        <div class="resource-header">
+                            {icon_html}
+                            <div class="resource-header-copy">
+                                <h4>{escape(resource.name)}</h4>
+                                <div class="resource-pill">{escape(resource.category)}</div>
+                            </div>
+                        </div>
+                        <div class="resource-copy">{escape(resource.description)}</div>
+                        <div class="resource-cost">
+                            <span class="resource-cost-label">Production Cost</span>
+                            {escape(resource.production_cost)}
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+
+def build_equipment_table_rows(equipment: EquipmentTypeInfo) -> str:
+    stat_lookup = {
+        "Helmet": "helmet",
+        "Chest Armour": "chest",
+        "Trousers": "pants",
+        "Gloves": "gloves",
+        "Boots": "boots",
+    }
+
+    if equipment.name == "Weapon":
+        rows = []
+        for tier in EQUIPMENT_TIERS:
+            weapon_icon = icon_file_data_uri(EQUIPMENT_ICONS_DIR, tier.weapon_icon_file)
+            weapon_icon_html = (
+                f'<span class="weapon-tier-icon-wrap"><img class="weapon-tier-icon" src="{weapon_icon}" alt="{escape(tier.weapon_name)} icon"></span>'
+                if weapon_icon
+                else ""
+            )
+            rows.append(
+                "".join(
+                    [
+                        "<tr>",
+                        f'<td><span class="equipment-tier-chip" style="background:{tier.theme}22;color:{tier.theme};border-color:{tier.theme}55;">{escape(tier.tier)}</span></td>',
+                        f'<td><div class="weapon-tier-cell">{weapon_icon_html}<span class="equipment-stat-highlight" style="color:{tier.theme};">{escape(tier.weapon_name)}</span></div></td>',
+                        f'<td><span class="equipment-stat-highlight" style="color:{tier.theme};">{escape(tier.weapon_damage)}</span></td>',
+                        f'<td><span class="equipment-stat-highlight" style="color:{tier.theme};">{escape(tier.weapon_crit)}</span></td>',
+                        "</tr>",
+                    ]
+                )
+            )
+
+        return (
+            '<table class="equipment-table">'
+            '<thead><tr><th>Rarity</th><th>Weapon</th><th>Damage</th><th>Crit</th></tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody>'
+            '</table>'
+        )
+
+    attribute_name = stat_lookup[equipment.name]
+    rows = []
+    for tier in EQUIPMENT_TIERS:
+        value = getattr(tier, attribute_name)
+        rows.append(
+            "".join(
+                [
+                    "<tr>",
+                    f'<td><span class="equipment-tier-chip" style="background:{tier.theme}22;color:{tier.theme};border-color:{tier.theme}55;">{escape(tier.tier)}</span></td>',
+                    f'<td><span class="equipment-stat-highlight" style="color:{tier.theme};">{escape(value)}</span></td>',
+                    "</tr>",
+                ]
+            )
+        )
+
+    return (
+        '<table class="equipment-table">'
+        '<thead><tr><th>Rarity</th><th>Stat Range</th></tr></thead>'
+        f'<tbody>{"".join(rows)}</tbody>'
+        '</table>'
+    )
+
+
+def render_equipment_reference() -> None:
+    st.markdown('<div id="equipment-reference"></div>', unsafe_allow_html=True)
+    st.markdown('<h3 class="info-card-title">Equipment Reference</h3>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="equipment-intro">Equipment comes in six rarity levels from best to worst: Red, Gold, Purple, Blue, Green, and Grey. You can obtain equipment through crafting with scrap, opening cases, or buying it from the market.</p>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('<h3 class="info-card-title">Equipment Types</h3>', unsafe_allow_html=True)
+    for start in range(0, len(EQUIPMENT_TYPES), 2):
+        row = EQUIPMENT_TYPES[start : start + 2]
+        columns = st.columns(len(row))
+        for column, equipment in zip(columns, row):
+            with column:
+                icon_data_uri = icon_file_data_uri(EQUIPMENT_ICONS_DIR, equipment.icon_file)
+                icon_html = (
+                    f'<div class="equipment-icon-wrap"><img class="equipment-icon" src="{icon_data_uri}" alt="{escape(equipment.name)} icon"></div>'
+                    if icon_data_uri
+                    else '<div class="equipment-icon-wrap"></div>'
+                )
+                st.markdown(
+                    f"""
+                    <div class="card equipment-card">
+                        <div class="equipment-card-header">
+                            {icon_html}
+                            <h4>{escape(equipment.name)}</h4>
+                        </div>
+                        <div class="equipment-effect">
+                            <span class="equipment-effect-label">Main Effect</span>
+                            {escape(equipment.effect)}
+                        </div>
+                        {build_equipment_table_rows(equipment)}
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+    st.markdown('<h3 class="info-card-title">Ammunition</h3>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="equipment-intro">There are three ammunition types in War Era. Each one increases the damage dealt by weapons while that ammunition is equipped.</p>',
+        unsafe_allow_html=True,
+    )
+
+    ammo_columns = st.columns(len(AMMO_TYPES))
+    for column, ammo in zip(ammo_columns, AMMO_TYPES):
+        with column:
+            icon_data_uri = icon_file_data_uri(EQUIPMENT_ICONS_DIR, ammo.icon_file)
+            icon_html = (
+                f'<div class="ammo-icon-wrap"><img class="ammo-icon" src="{icon_data_uri}" alt="{escape(ammo.name)} icon"></div>'
+                if icon_data_uri
+                else '<div class="ammo-icon-wrap"></div>'
+            )
+            st.markdown(
+                f"""
+                <div class="card ammo-card">
+                    <div class="ammo-card-header">
+                        {icon_html}
+                        <h4>{escape(ammo.name)}</h4>
+                    </div>
+                    <div class="ammo-bonus">{escape(ammo.bonus)}</div>
+                    <div class="ammo-copy">{escape(ammo.description)}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 
 def render_quick_start() -> None:
@@ -987,6 +1719,8 @@ def render_economy() -> None:
     st.markdown('<h2 class="section-title">Economy &amp; Companies</h2>', unsafe_allow_html=True)
     for block in ECONOMY_BLOCKS:
         render_info_block(block)
+        if block.title == "Company Types and Resources":
+            render_economy_resources()
     st.markdown(
         '<div class="tip-box">External tools: <a href="https://warerastats.io/tools" target="_blank">warerastats.io/tools</a></div>',
         unsafe_allow_html=True,
@@ -997,6 +1731,37 @@ def render_fighting() -> None:
     st.markdown('<h2 class="section-title">Fighting &amp; War</h2>', unsafe_allow_html=True)
     for block in FIGHT_BLOCKS:
         render_info_block(block)
+
+    with st.container(border=True):
+        st.markdown('<div class="armour-calc-marker"></div>', unsafe_allow_html=True)
+        st.markdown('<h3 class="info-card-title">Armour Protection Calculator</h3>', unsafe_allow_html=True)
+        st.write(
+            "Use this calculator to estimate health loss per hit based on your armour percentage."
+        )
+        st.caption(
+            "Formula: health loss = 10 - (armour percentage as a decimal × 10)"
+        )
+
+        armor_percentage = st.number_input(
+            "Armour percentage",
+            min_value=0.0,
+            max_value=100.0,
+            value=20.0,
+            step=1.0,
+            help="Enter your armour value as a percentage, for example 20 for 20%.",
+        )
+        armor_decimal = armor_percentage / 100
+        health_loss = 10 - (armor_decimal * 10)
+
+        result_col, formula_col = st.columns([1, 1])
+        with result_col:
+            st.metric("Health loss per hit", f"{health_loss:.2f}")
+        with formula_col:
+            st.write(
+                f"Example calculation: 10 - ({armor_decimal:.2f} × 10) = {health_loss:.2f}"
+            )
+
+    render_equipment_reference()
 
 
 def render_strategies() -> None:
