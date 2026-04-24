@@ -169,7 +169,7 @@ BASICS_BLOCKS: list[InfoBlock] = [
         ],
         bars=[
             ("green", "Health", "used for attacking"),
-            ("red", "Hunger", "1 Bread = 10 Health, 1 Steak = 20, 1 Fish = 30"),
+            ("red", "Hunger", "1 Bread = 10% Health, 1 Steak = 15%, 1 Fish = 20%"),
             ("blue", "Energy", "used for working for other players"),
             ("pink", "Entrepreneurship", "used for working in your own company"),
         ],
